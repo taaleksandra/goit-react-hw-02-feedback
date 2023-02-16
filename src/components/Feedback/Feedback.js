@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import clsx from 'clsx';
-import css from '../Feedback/Feedback.module.css';
-// import css from '../Buttons/Buttons.module.css';
 
-// import { Button } from '../Buttons/Buttons';
-import { Title } from '../Title/Title';
+import css from '../Feedback/Feedback.module.css';
+
+import { Section } from '../Section/Section';
+import { Statistics } from 'components/Statistics/Statistics';
+import { FeedbackOptions } from './FeedbackOptions';
+import { Notification } from 'components/Notification/Notification';
 
 export class Feedback extends Component {
   state = {
@@ -13,24 +15,13 @@ export class Feedback extends Component {
     bad: 0,
   };
 
-  handleGoodBtn = () => {
+  handleFeedback = evt => {
+    const btnName = evt.currentTarget.textContent;
     this.setState(prev => {
-      //   console.log(`Good btn was clicked ${prev.good + 1} times`);
-      return { good: prev.good + 1 };
+      return { [btnName]: prev[btnName] + 1 };
     });
   };
-  handleNeutralBtn = () => {
-    this.setState(prev => {
-      //   console.log(`Neutral btn was clicked ${prev.neutral + 1} times`);
-      return { neutral: prev.neutral + 1 };
-    });
-  };
-  handleBadBtn = () => {
-    this.setState(prev => {
-      //   console.log(`Bad btn was clicked ${prev.bad + 1} times`);
-      return { bad: prev.bad + 1 };
-    });
-  };
+
   countTotalFeedback = () => {
     return this.state.good + this.state.neutral + this.state.bad;
   };
@@ -45,44 +36,26 @@ export class Feedback extends Component {
 
     return (
       <div className={clsx(css.feedback)}>
-        <Title msg="Please leave feedback" />
+        <Section title="Please leave feedback">
+          <FeedbackOptions
+            options={this.state}
+            onLeaveFeedback={this.handleFeedback}
+          />
+        </Section>
 
-        <div className={clsx(css.buttons)}>
-          <button
-            onClick={this.handleGoodBtn}
-            type="button"
-            className={clsx(css.btn)}
-          >
-            Good
-          </button>
-          <button
-            onClick={this.handleNeutralBtn}
-            type="button"
-            className={clsx(css.btn)}
-          >
-            Neutral
-          </button>
-          <button
-            onClick={this.handleBadBtn}
-            type="button"
-            className={clsx(css.btn)}
-          >
-            Bad
-          </button>
-        </div>
-
-        <div>
-          <Title msg="Statistics" />
-          <span className={clsx(css.statdesc)}>Good: {good}</span>
-          <span className={clsx(css.statdesc)}>Neutral: {neutral}</span>
-          <span className={clsx(css.statdesc)}>Bad: {bad}</span>
-          <span className={clsx(css.statdesc)}>
-            Total: {this.countTotalFeedback()}
-          </span>
-          <span className={clsx(css.statdesc)}>
-            Positive feedback: {this.countPositiveFeedbackPercentage()}%
-          </span>
-        </div>
+        <Section title="Statistics">
+          {this.countTotalFeedback() === 0 ? (
+            <Notification msg="There is no feedback" />
+          ) : (
+            <Statistics
+              good={good}
+              neutral={neutral}
+              bad={bad}
+              total={this.countTotalFeedback()}
+              positivePercentage={this.countPositiveFeedbackPercentage()}
+            />
+          )}
+        </Section>
       </div>
     );
   }
